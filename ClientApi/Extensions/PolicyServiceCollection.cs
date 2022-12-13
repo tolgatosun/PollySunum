@@ -1,6 +1,8 @@
-﻿using Polly;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using Polly.CircuitBreaker;
 using Polly.Retry;
+using Polly.Wrap;
 using System.Net;
 
 namespace ClientApi.Extensions
@@ -9,6 +11,9 @@ namespace ClientApi.Extensions
     {
         public static IServiceCollection RegisterPolicyCollection(this IServiceCollection services)
         {
+
+            #region Policy
+
             HttpStatusCode[] httpStatusCodesWorthRetrying = {
                         HttpStatusCode.RequestTimeout, // 408
                         HttpStatusCode.InternalServerError, // 500
@@ -27,21 +32,30 @@ namespace ClientApi.Extensions
 
             var circuitBreakerPolicy = Policy
                                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-                                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
+                                .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
 
             var circuitBreakerPolicyHalfOpen = Policy
                                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-                                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
+                                .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
 
-            var advancedCircuitBreakerPolicy = Policy
+            var circuitBreakerAdvancedPolicy = Policy
                                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
                                 .AdvancedCircuitBreakerAsync(0.25, TimeSpan.FromSeconds(60), 7, TimeSpan.FromSeconds(30), OnBreak, OnReset, OnHalfOpen);
 
+            var retryAndCircuitBreakerPolicy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy); 
+            #endregion
+
+
+             
+
             services.AddSingleton<AsyncRetryPolicy<HttpResponseMessage>>(retryPolicy);
+            
             services.AddSingleton<AsyncCircuitBreakerPolicy<HttpResponseMessage>>(circuitBreakerPolicy);
-            services.AddSingleton<AsyncCircuitBreakerPolicy<HttpResponseMessage>>(advancedCircuitBreakerPolicy);
-
-
+            
+            //services.AddSingleton<AsyncCircuitBreakerPolicy<HttpResponseMessage>>(circuitBreakerAdvancedPolicy);
+            
+            //services.AddSingleton<AsyncPolicyWrap<HttpResponseMessage>>(retryAndCircuitBreakerPolicy);
+              
             return services;
         }
 
