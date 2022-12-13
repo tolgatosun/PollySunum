@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ProductApi.Model;
 
 namespace ProductApi.Controllers
 {
@@ -30,7 +31,7 @@ namespace ProductApi.Controllers
                     _recoveryTime = DateTime.UtcNow.AddSeconds(30);
                 }
 
-                return Ok("Product Details");
+                return Ok(new Products() { Id = Random.Next(1, 100), Name = Guid.NewGuid().ToString() });
             }
             catch (Exception ex)
             {
