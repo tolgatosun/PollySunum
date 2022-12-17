@@ -12,7 +12,7 @@ namespace ProductApi.Controllers
 
         public ProductController()
         {
-            
+
         }
 
         [HttpGet]
@@ -37,6 +37,29 @@ namespace ProductApi.Controllers
             {
                 return StatusCode(503);
             }
+        }
+
+        [HttpGet]
+        [Route("GetFallBack1")]
+        public async Task<IActionResult> GetFallBack1()
+        {
+            return Ok("Success");
+        }
+
+        [HttpGet]
+        [Route("GetFallBack2")]
+        public async Task<IActionResult> GetFallBack2()
+        {
+            return NotFound("NotFound");
+        }
+
+        [HttpGet]
+        [Route("GetTimeout")]
+        public async Task<IActionResult> GetTimeout()
+        {
+            Thread.Sleep(20000);
+
+            return Ok(new Products() { Id = Random.Next(1, 100), Name = Guid.NewGuid().ToString() });
         }
     }
 }
