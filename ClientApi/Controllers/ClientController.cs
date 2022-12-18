@@ -19,7 +19,7 @@ namespace ClientApi.Controllers
         private readonly AsyncRetryPolicy<HttpResponseMessage> _retryPolicy;
         private readonly AsyncCircuitBreakerPolicy<HttpResponseMessage> _circuitBreakerPolicy;
         private readonly AsyncTimeoutPolicy _timeoutPolicy;
-        private readonly string _apiUrl = "https://localhost:7101/Product";
+        private readonly string _apiUrl = "https://localhost:7101";
 
         public ClientController(IHttpClientFactory httpClientFactory, AsyncRetryPolicy<HttpResponseMessage> retryPolicy, AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy, AsyncTimeoutPolicy timeoutPolicy)
         {
@@ -36,7 +36,7 @@ namespace ClientApi.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            var response = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/GetProductDetails"));
+            var response = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/Product/GetProductDetails"));
 
             if (!response.IsSuccessStatusCode)
             {
@@ -77,7 +77,7 @@ namespace ClientApi.Controllers
 
             var httpClient = _httpClientFactory.CreateClient();
 
-            var response = await _circuitBreakerPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/GetProductDetails"));
+            var response = await _circuitBreakerPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/Product/GetProductDetails"));
 
             if (!response.IsSuccessStatusCode)
             {
@@ -98,7 +98,7 @@ namespace ClientApi.Controllers
             var _fallbackPolicy = Policy.HandleResult<HttpResponseMessage>(x => x.StatusCode != HttpStatusCode.OK)
                                         .FallbackAsync(_ => httpClient.GetAsync($"{_apiUrl}/GetFallBack2"));
 
-            var fallbackResult = await _fallbackPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/GetFallBack1"));
+            var fallbackResult = await _fallbackPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/Product/GetFallBack1"));
              
 
             if (fallbackResult.StatusCode == System.Net.HttpStatusCode.OK)
@@ -119,7 +119,7 @@ namespace ClientApi.Controllers
             {
                 var httpClient = _httpClientFactory.CreateClient();
 
-                var response = await _timeoutPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/GetTimeout"));
+                var response = await _timeoutPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/Product/GetTimeout"));
 
                 if (!response.IsSuccessStatusCode)
                 {

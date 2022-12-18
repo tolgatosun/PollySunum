@@ -36,7 +36,7 @@ namespace ClientApi.Extensions
 
             var circuitBreakerPolicy = Policy
                                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-                                .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
+                                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
               
 
             var circuitBreakerAdvancedPolicy = Policy
@@ -55,9 +55,6 @@ namespace ClientApi.Extensions
             var timeoutPolicy = Policy.TimeoutAsync(5, Polly.Timeout.TimeoutStrategy.Pessimistic);
 
             #endregion
-
-
-
 
 
 
