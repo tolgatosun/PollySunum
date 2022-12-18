@@ -39,20 +39,23 @@ namespace ProductApi.Controllers
             }
         }
 
+
         [HttpGet]
         [Route("GetFallBack1")]
         public async Task<IActionResult> GetFallBack1()
         {
-            return Ok("Success");
+            return NotFound("NotFound");
         }
 
+         
         [HttpGet]
         [Route("GetFallBack2")]
         public async Task<IActionResult> GetFallBack2()
         {
-            return NotFound("NotFound");
+            return Ok("Success");
         }
 
+       
         [HttpGet]
         [Route("GetTimeout")]
         public async Task<IActionResult> GetTimeout()
