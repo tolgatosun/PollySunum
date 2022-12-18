@@ -41,7 +41,13 @@ namespace ClientApi.Extensions
 
             var circuitBreakerAdvancedPolicy = Policy
                                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-                                .AdvancedCircuitBreakerAsync(0.25, TimeSpan.FromSeconds(60), 7, TimeSpan.FromSeconds(30), OnBreak, OnReset, OnHalfOpen);
+                                .AdvancedCircuitBreakerAsync(failureThreshold: 0.25, // // Break on >=25% actions result in handled exceptions...
+                                                             samplingDuration:  TimeSpan.FromSeconds(60), // ... over any 60 second period
+                                                             minimumThroughput: 8, // ... provided at least 8 actions in the 60 second period.
+                                                             durationOfBreak: TimeSpan.FromSeconds(30),  // Break for 30 seconds.
+                                                             OnBreak, 
+                                                             OnReset, 
+                                                             OnHalfOpen);
 
 
             var retryAndCircuitBreakerWrapPolicy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
@@ -68,6 +74,7 @@ namespace ClientApi.Extensions
 
             return services;
         }
+
 
         static void OnHalfOpen()
         {

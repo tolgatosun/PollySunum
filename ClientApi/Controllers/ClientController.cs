@@ -74,6 +74,7 @@ namespace ClientApi.Controllers
                 #endregion
             }
 
+
             var httpClient = _httpClientFactory.CreateClient();
 
             var response = await _circuitBreakerPolicy.ExecuteAsync(() => httpClient.GetAsync($"{_apiUrl}/GetProductDetails"));
